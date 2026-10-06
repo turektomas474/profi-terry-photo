@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mini E‑shop (jediný soubor) – SPA + fake backend</title>
+  <meta name="description" content="Studijní e‑shop postavený čistě na HTML, CSS a JavaScriptu v jediném souboru. SPA s hash routerem, localStorage, katalog, detail, košík, pokladna a admin objednávky." />
+
+  <!-- ===========================
+       ZÁKLADNÍ STYLY (čisté CSS)
+       - Responzivní layout (flex + grid)
+       - Světlý/temný kontrast, přehlednost
+       - Bez externích knihoven
+       =========================== -->
+  <style>
+        /* 01 RESET */
+        /* 02 BODY */
+        /* 03 SECTION */
+        /* 04 GLOBAL STYLES */
+        /* 05 LAYOUT */
+        /* 06 HTML ELEMENTS LAYOUT */
+        /* 07 UTILITY */
+        /* 08 TYPOGRAPHY */
+        /* 09 IMG INPUT LABEL BUTTON  */
+        /* 10 FORM */
+        /* 11 SPECIFIC SECTIONS */
+        /* 12 RESPONSIVITY */
+        /* 13 DEMO */
+
+
+        /* 01 RESET */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Noto Sans', 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+            color: inherit;
+        }
+
+        /* 02 BODY */
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+
+            background: linear-gradient(180deg, #f7f9fc 0%, #eaf0f8 100%);
+            color: #1a2030;
+
+            font-size: 16px;
+            line-height: 1.5;
+            letter-spacing: .2px;
+        }
+
+        /* 03 SECTION */
+        section {
+            background: radial-gradient(1200px 300px at top, rgba(79, 140, 255, .06), transparent 50%), #ffffff;
+            border: 1px solid #d9dfe8;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(20, 30, 60, .08);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 14px 18px;
+        }
+
+        .section-title h2 {
+            font-size: 20px;
+        }
+
+        .section-body {
+            padding: 18px;
+        }
+
+        /* 04 GLOBAL STYLES */
+        /* BARVY (dříve proměnné :root, nyní zapsané přímo jako hex)
+           pozadí: #f7f9fc → #eaf0f8 | panel: #ffffff | linka: #d9dfe8
+           text: #1a2030 | text tlumený: #5b6677
+           akcent: #4f8cff | akcent 2: #00c2a8 | danger: #ff5678
+           pole formuláře: #ffffff | tlačítko: #f1f4f9 | karta: #f8fafd | obrázek: #e9edf4 | odznak: #2f6fe4
+           radius: 16px (panel) | 10px (pole, tlačítka) */
+
+        /* 05 LAYOUT */
+        .app {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        main {
+            display: grid;
+            gap: 20px;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+
+            backdrop-filter: saturate(140%) blur(8px);
+            background-color: rgba(255, 255, 255, .8);
+            border-bottom: 1px solid #d9dfe8;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+
+            padding: 12px 16px;
+        }
+
+        .nav a {
+            padding: 8px 12px;
+
+            border: 1px solid #d9dfe8;
+            border-radius: 999px;
+
+            opacity: .9;
+        }
+
+        .nav a.is-active {
+            background: linear-gradient(135deg, rgba(79, 140, 255, .2), rgba(0, 194, 168, .2));
+            border-color: transparent;
+        }
+
+        .nav-spacer {
+            flex: 1;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+
+            margin-bottom: 12px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 1000px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 720px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .inline {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-wrap {
+            overflow: auto;
+        }
+
+        /* 06 HTML ELEMENTS LAYOUT */
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 10px 12px;
+
+            border-bottom: 1px solid #d9dfe8;
+            text-align: left;
+        }
+
+        th {
+            color: #5b6677;
+            font-weight: 600;
+        }
+
+        /* 07 UTILITY */
+        .muted {
+            color: #5b6677;
+        }
+
+        /* 08 TYPOGRAPHY */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            font-weight: 800;
+            letter-spacing: .4px;
+        }
+
+        .price {
+            font-weight: 700;
+        }
+
+        .help {
+            color: #5b6677;
+            font-size: .9em;
+        }
+
+        /* 09 IMG INPUT LABEL BUTTON  */
+        .brand-dot {
+            width: 10px;
+            height: 10px;
+
+            border-radius: 50%;
+
+            background: linear-gradient(135deg, #4f8cff, #00c2a8);
+            box-shadow: 0 0 20px rgba(79, 140, 255, .6);
+        }
+
+        .badge {
+            padding: 2px 8px;
+
+            border-radius: 999px;
+
+            background-color: #2f6fe4;
+            color: #ffffff;
+            font-weight: 800;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            padding: 10px 12px;
+
+            border: 1px solid #d9dfe8;
+            border-radius: 10px;
+
+            background-color: #f1f4f9;
+
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(79, 140, 255, .22), rgba(0, 194, 168, .22));
+            border-color: transparent;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, rgba(255, 86, 120, .25), rgba(255, 86, 120, .15));
+            border-color: transparent;
+        }
+
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .qty {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty button {
+            width: 32px;
+            height: 32px;
+        }
+
+        .qty-input {
+            width: 70px;
+        }
+
+        /* 10 FORM */
+        form {
+            display: grid;
+            gap: 12px;
+
+            max-width: 640px;
+        }
+
+        label {
+            display: grid;
+            gap: 6px;
+        }
+
+        input,
+        textarea {
+            padding: 10px 12px;
+
+            background-color: #ffffff;
+            border: 1px solid #d9dfe8;
+            border-radius: 10px;
+        }
+
+        .search {
+            flex: 1;
+            min-width: 240px;
+
+            display: flex;
+            gap: 8px;
+        }
+
+        .search input {
+            flex: 1;
+        }
+
+        /* 11 SPECIFIC SECTIONS */
+
+        /* ---------- KATALOG ---------- */
+        .card {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            overflow: hidden;
+
+            background-color: #f8fafd;
+            border: 1px solid #d9dfe8;
+            border-radius: 16px;
+        }
+
+        .card img {
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+
+            background-color: #e9edf4;
+        }
+
+        .card-body {
+            padding: 12px;
+        }
+
+        /* ---------- DETAIL ---------- */
+        .detail-wrap {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1000px) {
+            .detail-wrap {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .detail-img {
+            overflow: hidden;
+
+            border: 1px solid #d9dfe8;
+            border-radius: 16px;
+        }
+
+        .detail-title {
+            margin-bottom: 8px;
+        }
+
+        .detail-stock {
+            margin-bottom: 10px;
+        }
+
+        .detail-desc {
+            margin-bottom: 16px;
+        }
+
+        .detail-price {
+            margin: 10px 0;
+
+            font-size: 22px;
+        }
+
+        .detail-actions {
+            margin: 10px 0 16px;
+        }
+
+        /* ---------- KOŠÍK ---------- */
+        .cart-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            gap: 12px;
+
+            padding: 10px 0;
+
+            border-bottom: 1px dashed #d9dfe8;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-img {
+            border-radius: 10px;
+        }
+
+        .cart-controls {
+            margin-top: 6px;
+        }
+
+        .cart-footer {
+            margin-top: 12px;
+        }
+
+        .totals {
+            display: grid;
+            gap: 8px;
+
+            max-width: 420px;
+            padding-top: 12px;
+
+            border-top: 1px solid #d9dfe8;
+        }
+
+        .totals-final {
+            font-size: 18px;
+        }
+
+        /* ---------- ADMIN ---------- */
+        .admin-actions {
+            margin-bottom: 10px;
+        }
+
+        /* 12 RESPONSIVITY */
+        /* media query jsou u jednotlivých pravidel */
+
+        /* 13 DEMO */
+    </style>
+</head>
+<body>
+  <!-- ===========================
+       NAVIGACE A STATUS BAR
+       - SPA ovládání přes #hash
+       - Zobrazení počtu položek v košíku
+       =========================== -->
+  <header>
+    <div class="app nav">
+      <div class="brand"><span class="brand-dot"></span> Mini E‑shop</div>
+      <a href="#catalog" data-link>🛍️ Katalog</a>
+      <a href="#cart" data-link>🧺 Košík <span id="navCartCount" class="badge">0</span></a>
+      <a href="#checkout" data-link>💳 Pokladna</a>
+      <a href="#admin" data-link>🛠️ Admin</a>
+      <span class="nav-spacer"></span>
+      <span class="muted" id="status"></span>
+    </div>
+  </header>
+
+  <main class="app">
+
+    <!-- ===========================
+         SEKCE: KATALOG (#catalog)
+         - Vyhledávání podle názvu
+         - Karty produktů
+         =========================== -->
+    <section id="catalog" class="route">
+      <div class="section-title"><h2>🛍️ Katalog</h2></div>
+      <div class="section-body">
+        <div class="toolbar">
+          <div class="search">
+            <input id="searchInput" type="search" placeholder="Hledat produkt podle názvu…" />
+            <button id="searchClear" class="btn" title="Vymazat">✖</button>
+          </div>
+          <div class="muted">Počet produktů: <strong id="productCount">0</strong></div>
+        </div>
+        <div id="productGrid" class="grid"></div>
+      </div>
+    </section>
+
+    <!-- ===========================
+         SEKCE: DETAIL (#detail/:id)
+         - Velký obrázek, popis, cena
+         - Přidání do košíku / práce s položkou
+         =========================== -->
+    <section id="detail" class="route" hidden>
+      <div class="section-title"><h2>🔎 Detail produktu</h2></div>
+      <div class="section-body">
+        <div id="detailBody" class="detail-wrap"></div>
+      </div>
+    </section>
+
+    <!-- ===========================
+         SEKCE: KOŠÍK (#cart)
+         - Výpis položek, množství, mazání
+         - Mez součet a celkem
+         =========================== -->
+    <section id="cart" class="route" hidden>
+      <div class="section-title"><h2>🧺 Košík</h2></div>
+      <div class="section-body">
+        <div id="cartList"></div>
+        <div id="cartTotals" class="totals"></div>
+        <div class="row cart-footer">
+          <a class="btn" href="#catalog">⬅️ Zpět do katalogu</a>
+          <a class="btn btn-primary" href="#checkout">Pokračovat k pokladně ➡️</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===========================
+         SEKCE: POKLADNA (#checkout)
+         - Formulář s validací
+         - Uložení objednávky + vyprázdnění košíku
+         =========================== -->
+    <section id="checkout" class="route" hidden>
+      <div class="section-title"><h2>💳 Pokladna</h2></div>
+      <div class="section-body">
+        <form id="checkoutForm">
+          <label>Jméno a příjmení<input name="name" required placeholder="Jan Novák" /></label>
+          <label>E‑mail<input name="email" required type="email" placeholder="jan.novak@example.cz" /></label>
+          <label>Adresa<input name="address" required placeholder="Ulice 123" /></label>
+          <label>Město<input name="city" required placeholder="Praha" /></label>
+          <label>PSČ<input name="zip" required pattern="\\d{3}\\s?\\d{2}" placeholder="110 00" /></label>
+          <div class="help">Po odeslání se objednávka uloží do LocalStorage a košík se vyprázdní.</div>
+          <div class="row">
+            <a class="btn" href="#cart">⬅️ Zpět do košíku</a>
+            <button class="btn btn-primary" type="submit">Odeslat objednávku</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===========================
+         SEKCE: ADMIN (#admin)
+         - Tabulka všech objednávek z localStorage
+         - Možnost mazat objednávky
+         =========================== -->
+    <section id="admin" class="route" hidden>
+      <div class="section-title"><h2>🛠️ Administrace objednávek</h2></div>
+      <div class="section-body">
+        <div class="row admin-actions">
+          <button id="purgeAll" class="btn btn-danger">Smazat VŠECHNY objednávky</button>
+          <span class="muted">Počet objednávek: <strong id="orderCount">0</strong></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ID</th>
+                <th>Vytvořeno</th>
+                <th>Zákazník</th>
+                <th>E‑mail</th>
+                <th>Adresa</th>
+                <th>Položky</th>
+                <th>Celkem</th>
+                <th>Akce</th>
+              </tr>
+            </thead>
+            <tbody id="orderTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===========================
+       LOGIKA A FAKE BACKEND (čistý JS)
+       - Jednoduchý hash router (SPA)
+       - localStorage (cart, orders)
+       - In‑memory produkty
+       - Modulární funkce s komentáři
+       =========================== -->
+  <script>
+    /* -----------------------------------------
+     * Pomocné nástroje a "fake backend" datové struktury
+     * ----------------------------------------- */
+    const LS = {
+      get(key, fallback){ try{ return JSON.parse(localStorage.getItem(key)) ?? fallback }catch{ return fallback } },
+      set(key, value){ localStorage.setItem(key, JSON.stringify(value)) },
+      remove(key){ localStorage.removeItem(key) }
+    };
+
+    // Formátování CZK cen
+    const CZK = new Intl.NumberFormat('cs-CZ', { style:'currency', currency:'CZK', maximumFractionDigits:0 });
+
+    // "Databáze" produktů – normálně by přišlo z API. Tady hard‑code pro studijní účely.
+    const PRODUCTS = [
+      { id:'p1', name:'Bennon Desert Light O1', price:2490, stock:15, image:'bennon-desert-light.jpg', desc:'Lehká taktická 10dírková obuv v pískovém provedení. Maximální pohodlí a odolnost v náročném terénu.' },
+      { id:'p2', name:'Tričko Butch & Sundance', price:690, stock:25, image:'tricko-butch-sundance.jpg', desc:'Stylové bavlněné triko s kultovním westernovým motivem a filmovou patinou. Pohodlný střih na běžné nošení.' },
+      { id:'p3', name:'Plakát Tereza Tactical Instructor', price:390, stock:40, image:'plakat-profi-terry-photo.jpg', desc:'Motivační nástěnný plakát na kvalitním křídovém papíře. Ideální doplňkový prvek do klubovny i pracovny.' },
+      { id:'p4', name:'Bronzový taktický emblém', price:290, stock:50, image:'bronzovy-takticky-emblem.png', desc:'Masivní kovový odznak s patinou a suchým zipem (Velcro). Vhodný na taktickou vestu, batoh i čepici.' },
+      { id:'p5', name:'Kapesní brožura První pomoc duchovní', price:450, stock:10, image:'prvni-pomoc-ducovni.png', desc:'Unikátní polní manuál v plátěné vazbě se zlatou ražbou. Historický text křtu z nouze pro krizové situace.' },
+      { id:'p6', name:'Dárkový poukaz ProFi Terry Photo', price:1500, stock:99, image:'poukaz-profi-terry-photo.png', desc:'Luxusní dárkový voucher na ateliérové portréty nebo eventové fotografování. Baleno v reprezentativní obálce.' }
+    ];
+
+    // Cesta k produktovým obrázkům (relativně k HTML souboru)
+    const IMG_PATH = 'assets/img/';
+    function imageUrl(p){ return IMG_PATH + p.image }
+
+    // Inicializace/přístup k localStorage košík & objednávky
+    function getCart(){ return LS.get('cart', []) }
+    function setCart(items){ LS.set('cart', items); renderCartBadge() }
+    function getOrders(){ return LS.get('orders', []) }
+    function setOrders(list){ LS.set('orders', list) }
+
+    // Vyhledání produktu dle ID
+    function findProduct(id){ return PRODUCTS.find(p => p.id === id) }
+
+    // Přidání do košíku
+    function addToCart(productId, qty=1){
+      const cart = getCart();
+      const item = cart.find(i => i.id === productId);
+      if(item){ item.qty = Math.min(item.qty + qty, 99) }
+      else { cart.push({ id: productId, qty: Math.max(1, qty) }) }
+      setCart(cart);
+      flashStatus('Přidáno do košíku');
+    }
+
+    // Změna množství/mazání
+    function updateCart(productId, qty){
+      let cart = getCart();
+      const idx = cart.findIndex(i => i.id === productId);
+      if(idx === -1) return;
+      if(qty <= 0){ cart.splice(idx,1) }
+      else { cart[idx].qty = Math.min(qty, 99) }
+      setCart(cart);
+    }
+
+    // Výpočty celkové ceny košíku
+    function cartTotals(){
+      const cart = getCart();
+      let subtotal = 0; let items = 0;
+      const detailed = cart.map(row => {
+        const p = findProduct(row.id); const lineTotal = p.price * row.qty; items += row.qty; subtotal += lineTotal;
+        return { ...row, product: p, lineTotal };
+      });
+      const shipping = subtotal > 2500 || subtotal === 0 ? 0 : 99;
+      const total = subtotal + shipping;
+      return { items, subtotal, shipping, total, detailed };
+    }
+
+    // Rychlá status hláška vpravo nahoře
+    let statusTimer;
+    function flashStatus(text){
+      const el = document.getElementById('status');
+      el.textContent = text; clearTimeout(statusTimer);
+      statusTimer = setTimeout(() => el.textContent = '', 2000);
+    }
+
+    // Odznak s počtem položek
+    function renderCartBadge(){
+      const count = getCart().reduce((a,b)=>a+b.qty,0);
+      document.getElementById('navCartCount').textContent = count;
+    }
+
+    /* -----------------------------------------
+     * Router (hash‑based): #catalog, #detail/:id, #cart, #checkout, #admin
+     * ----------------------------------------- */
+    const routes = ['catalog','detail','cart','checkout','admin'];
+    function handleRoute(){
+      const hash = location.hash.replace('#','') || 'catalog';
+      const [route, param] = hash.split('/');
+      // zviditelnit správnou sekci
+      document.querySelectorAll('.route').forEach(s => s.hidden = true);
+      const target = document.getElementById(route) || document.getElementById('catalog');
+      target.hidden = false;
+      // aktivní záložka
+      document.querySelectorAll('[data-link]').forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === `#${route}`));
+
+      // logika pro konkrétní view
+      if(route === 'catalog') renderCatalog();
+      if(route === 'detail') renderDetail(param);
+      if(route === 'cart') renderCart();
+      if(route === 'checkout') {/* nic spec */}
+      if(route === 'admin') renderAdmin();
+    }
+    window.addEventListener('hashchange', handleRoute);
+
+    /* -----------------------------------------
+     * Render: Katalog
+     * ----------------------------------------- */
+    function renderCatalog(){
+      const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      const items = PRODUCTS.filter(p => p.name.toLowerCase().includes(q));
+      document.getElementById('productCount').textContent = items.length;
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = '';
+      for(const p of items){
+        const card = document.createElement('div');
+        card.className = 'card';
+        const img = document.createElement('img'); img.src = imageUrl(p); img.alt = p.name;
+        const pad = document.createElement('div'); pad.className = 'card-body';
+        const name = document.createElement('div'); name.textContent = p.name;
+        const row = document.createElement('div'); row.className = 'row';
+        const price = document.createElement('div'); price.className = 'price'; price.textContent = CZK.format(p.price);
+        const actions = document.createElement('div'); actions.className = 'inline';
+        const btnDetail = document.createElement('a'); btnDetail.href = `#detail/${p.id}`; btnDetail.className='btn'; btnDetail.textContent = 'Detail';
+        const btnAdd = document.createElement('button'); btnAdd.className='btn btn-primary'; btnAdd.textContent = 'Do košíku';
+        btnAdd.addEventListener('click', ()=>{ addToCart(p.id, 1); renderCartBadge() });
+        actions.append(btnDetail, btnAdd);
+        row.append(price, actions);
+        pad.append(name, row);
+        card.append(img, pad);
+        grid.append(card);
+      }
+    }
+
+    // Ovládání vyhledávání
+    document.getElementById('searchInput').addEventListener('input', renderCatalog);
+    document.getElementById('searchClear').addEventListener('click', ()=>{ document.getElementById('searchInput').value=''; renderCatalog() });
+
+    /* -----------------------------------------
+     * Render: Detail produktu
+     * ----------------------------------------- */
+    function renderDetail(id){
+      const container = document.getElementById('detailBody');
+      const p = findProduct(id);
+      if(!p){ container.innerHTML = '<p class="muted">Produkt nebyl nalezen.</p>'; return }
+      const cartItem = getCart().find(i => i.id === p.id);
+      const qty = cartItem?.qty ?? 0;
+
+      container.innerHTML = `
+        <div>
+          <img class="detail-img" src="${imageUrl(p)}" alt="${p.name}" />
+        </div>
+        <div>
+          <h3 class="detail-title">${p.name}</h3>
+          <div class="muted detail-stock">Skladem: ${p.stock} ks</div>
+          <p class="detail-desc">${p.desc}</p>
+          <div class="price detail-price">${CZK.format(p.price)}</div>
+
+          <div class="inline detail-actions">
+            <div class="qty">
+              <button class="btn" id="minus">−</button>
+              <input id="qty" class="qty-input" type="number" min="1" max="99" value="${Math.max(qty,1)}" />
+              <button class="btn" id="plus">+</button>
+            </div>
+            <button id="addBtn" class="btn btn-primary">${qty>0? 'Aktualizovat košík' : 'Přidat do košíku'}</button>
+            ${qty>0 ? '<button id="removeBtn" class="btn btn-danger">Odebrat z košíku</button>' : ''}
+          </div>
+
+          <div id="calc" class="muted"></div>
+        </div>`;
+
+      const qtyInput = document.getElementById('qty');
+      const recalc = ()=>{ const n = clamp(parseInt(qtyInput.value)||1,1,99); qtyInput.value=n; document.getElementById('calc').innerHTML = `Cena za ${n} ks: <strong>${CZK.format(n*p.price)}</strong>` };
+      recalc();
+      document.getElementById('minus').onclick = ()=>{ qtyInput.value = Math.max(1, (parseInt(qtyInput.value)||1)-1); recalc() };
+      document.getElementById('plus').onclick = ()=>{ qtyInput.value = Math.min(99, (parseInt(qtyInput.value)||1)+1); recalc() };
+      document.getElementById('addBtn').onclick = ()=>{ updateCart(p.id, parseInt(qtyInput.value)||1); if(qty===0){ flashStatus('Přidáno do košíku') } else { flashStatus('Košík aktualizován') } renderCartBadge() };
+      const rm = document.getElementById('removeBtn');
+      if(rm){ rm.onclick = ()=>{ updateCart(p.id, 0); renderCartBadge(); flashStatus('Položka odstraněna'); handleRoute() } }
+    }
+
+    function clamp(n,min,max){ return Math.max(min, Math.min(max, n)) }
+
+    /* -----------------------------------------
+     * Render: Košík
+     * ----------------------------------------- */
+    function renderCart(){
+      const list = document.getElementById('cartList');
+      const totals = cartTotals();
+      if(totals.detailed.length === 0){
+        list.innerHTML = '<p class="muted">Košík je prázdný.</p>';
+        document.getElementById('cartTotals').innerHTML = '';
+        return;
+      }
+      list.innerHTML = '';
+      for(const row of totals.detailed){
+        const div = document.createElement('div'); div.className='cart-item';
+        const img = document.createElement('img'); img.src = imageUrl(row.product); img.alt=row.product.name; img.className='cart-img';
+        const meta = document.createElement('div');
+        meta.innerHTML = `
+          <div class="row">
+            <a href="#detail/${row.product.id}"><strong>${row.product.name}</strong></a>
+            <span class="price">${CZK.format(row.product.price)}</span>
+          </div>
+          <div class="inline cart-controls">
+            <div class="qty">
+              <button class="btn" data-dec>−</button>
+              <input data-qty class="qty-input" type="number" min="1" max="99" value="${row.qty}" />
+              <button class="btn" data-inc>+</button>
+            </div>
+            <button class="btn btn-danger" data-remove>Odstranit</button>
+          </div>`;
+        const sum = document.createElement('div'); sum.innerHTML = `<div class="price">${CZK.format(row.lineTotal)}</div>`;
+        div.append(img, meta, sum); list.append(div);
+
+        // Handlery na ovládání množství
+        const qtyInput = meta.querySelector('[data-qty]');
+        meta.querySelector('[data-inc]').onclick = ()=>{ qtyInput.value = clamp(parseInt(qtyInput.value)||1,1,98)+1; updateCart(row.product.id, parseInt(qtyInput.value)); renderCart() };
+        meta.querySelector('[data-dec]').onclick = ()=>{ qtyInput.value = clamp(parseInt(qtyInput.value)||1,2,99)-1; updateCart(row.product.id, parseInt(qtyInput.value)); renderCart() };
+        qtyInput.addEventListener('change', ()=>{ updateCart(row.product.id, parseInt(qtyInput.value)||1); renderCart() });
+        meta.querySelector('[data-remove]').onclick = ()=>{ updateCart(row.product.id, 0); renderCart() };
+      }
+
+      document.getElementById('cartTotals').innerHTML = `
+        <div class="row"><span>Mezisoučet</span><strong>${CZK.format(totals.subtotal)}</strong></div>
+        <div class="row"><span>Doprava</span><strong>${totals.shipping===0? 'Zdarma' : CZK.format(totals.shipping)}</strong></div>
+        <div class="row totals-final"><span>Celkem</span><strong>${CZK.format(totals.total)}</strong></div>`;
+    }
+
+    /* -----------------------------------------
+     * Checkout – odeslání objednávky
+     * ----------------------------------------- */
+    document.getElementById('checkoutForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const form = e.currentTarget;
+      if(getCart().length === 0){ alert('Košík je prázdný.'); location.hash = '#catalog'; return }
+      if(!form.reportValidity()) return;
+      const data = Object.fromEntries(new FormData(form).entries());
+      const totals = cartTotals();
+      const order = {
+        id: 'ord_' + Math.random().toString(36).slice(2,8),
+        createdAt: new Date().toISOString(),
+        customer: data,
+        items: totals.detailed.map(d => ({ id:d.product.id, name:d.product.name, price:d.product.price, qty:d.qty, lineTotal:d.lineTotal })),
+        summary: { items: totals.items, subtotal: totals.subtotal, shipping: totals.shipping, total: totals.total }
+      };
+      const list = getOrders(); list.unshift(order); setOrders(list);
+      LS.remove('cart'); renderCartBadge();
+      form.reset();
+      alert('Děkujeme! Objednávka byla uložena a košík vyprázdněn.');
+      location.hash = '#admin';
+    });
+
+    /* -----------------------------------------
+     * Admin – výpis a mazání objednávek
+     * ----------------------------------------- */
+    function renderAdmin(){
+      const tbody = document.getElementById('orderTableBody');
+      const orders = getOrders();
+      document.getElementById('orderCount').textContent = orders.length;
+      tbody.innerHTML = '';
+      orders.forEach((o, idx) => {
+        const tr = document.createElement('tr');
+        const itemsText = o.items.map(i => `${i.name} × ${i.qty}`).join(', ');
+        tr.innerHTML = `
+          <td>${idx+1}</td>
+          <td><code>${o.id}</code></td>
+          <td>${new Date(o.createdAt).toLocaleString('cs-CZ')}</td>
+          <td>${o.customer.name}</td>
+          <td>${o.customer.email}</td>
+          <td>${o.customer.address}, ${o.customer.city} ${o.customer.zip}</td>
+          <td>${itemsText}</td>
+          <td><strong>${CZK.format(o.summary.total)}</strong></td>
+          <td><button class="btn btn-danger" data-del="${o.id}">Smazat</button></td>`;
+        tbody.append(tr);
+      });
+      // Mazání objednávky
+      tbody.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', ()=>{
+        const id = btn.getAttribute('data-del');
+        const orders = getOrders().filter(o => o.id !== id); setOrders(orders); renderAdmin();
+      }));
+    }
+
+    document.getElementById('purgeAll').addEventListener('click', ()=>{
+      if(confirm('Opravdu smazat všechny objednávky?')){ LS.remove('orders'); renderAdmin() }
+    });
+
+    /* -----------------------------------------
+     * Start aplikace
+     * ----------------------------------------- */
+    renderCartBadge();
+    handleRoute();
+  </script>
+</body>
+</html>
