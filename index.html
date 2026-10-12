@@ -622,13 +622,99 @@
     const CZK = new Intl.NumberFormat('cs-CZ', { style:'currency', currency:'CZK', maximumFractionDigits:0 });
 
     // "Databáze" produktů – normálně by přišlo z API. Tady hard‑code pro studijní účely.
+    // "Databáze" produktů pro e-shop
     const PRODUCTS = [
-      { id:'p1', name:'Bennon Desert Light O1', price:2490, stock:15, image:'bennon-desert-light.jpg', desc:'Lehká taktická 10dírková obuv v pískovém provedení. Maximální pohodlí a odolnost v náročném terénu.' },
-      { id:'p2', name:'Tričko Butch & Sundance', price:690, stock:25, image:'tricko-butch-sundance.jpg', desc:'Stylové bavlněné triko s kultovním westernovým motivem a filmovou patinou. Pohodlný střih na běžné nošení.' },
-      { id:'p3', name:'Plakát Tereza Tactical Instructor', price:390, stock:40, image:'plakat-profi-terry-photo.jpg', desc:'Motivační nástěnný plakát na kvalitním křídovém papíře. Ideální doplňkový prvek do klubovny i pracovny.' },
-      { id:'p4', name:'Bronzový taktický emblém', price:290, stock:50, image:'bronzovy-takticky-emblem.png', desc:'Masivní kovový odznak s patinou a suchým zipem (Velcro). Vhodný na taktickou vestu, batoh i čepici.' },
-      { id:'p5', name:'Kapesní brožura První pomoc duchovní', price:450, stock:10, image:'prvni-pomoc-ducovni.png', desc:'Unikátní polní manuál v plátěné vazbě se zlatou ražbou. Historický text křtu z nouze pro krizové situace.' },
-      { id:'p6', name:'Dárkový poukaz ProFi Terry Photo', price:1500, stock:99, image:'poukaz-profi-terry-photo.png', desc:'Luxusní dárkový voucher na ateliérové portréty nebo eventové fotografování. Baleno v reprezentativní obálce.' }
+      // PŮVODNÍ PRODUKTY
+      { 
+        id: 'p1', 
+        name: 'Bennon Desert Light O1', 
+        price: 2490, 
+        stock: 15, 
+        image: 'bennon-desert-light.jpg', 
+        desc: 'Lehká taktická 10dírková obuv v pískovém provedení. Maximální pohodlí a odolnost v náročném terénu.' 
+      },
+      { 
+        id: 'p2', 
+        name: 'Tričko Butch & Sundance', 
+        price: 690, 
+        stock: 25, 
+        image: 'tricko-butch-sundance.jpg', 
+        desc: 'Stylové bavlněné triko s kultovním westernovým motivem a filmovou patinou. Pohodlný střih na běžné nošení.' 
+      },
+      { 
+        id: 'p3', 
+        name: 'Plakát Tereza Tactical Instructor', 
+        price: 390, 
+        stock: 40, 
+        image: 'plakat-profi-terry-photo.jpg', 
+        desc: 'Motivační nástěnný plakát na kvalitním křídovém papíře. Ideální doplňkový prvek do klubovny i pracovny.' 
+      },
+      { 
+        id: 'p4', 
+        name: 'Bronzový taktický emblém', 
+        price: 290, 
+        stock: 50, 
+        image: 'bronzovy-takticky-emblem.png', 
+        desc: 'Masivní kovový odznak s patinou a suchým zipem (Velcro). Vhodný na taktickou vestu, batoh i čepici.' 
+      },
+      { 
+        id: 'p5', 
+        name: 'Kapesní brožura První pomoc duchovní', 
+        price: 450, 
+        stock: 10, 
+        image: 'prvni-pomoc-ducovni.png', 
+        desc: 'Unikátní polní manuál v plátěné vazbě se zlatou ražbou. Historický text křtu z nouze pro krizové situace.' 
+      },
+      { 
+        id: 'p6', 
+        name: 'Dárkový poukaz ProFi Terry Photo', 
+        price: 1500, 
+        stock: 99, 
+        image: 'poukaz-profi-terry-photo.png', 
+        desc: 'Luxusní dárkový voucher na ateliérové portréty nebo eventové fotografování. Baleno v reprezentativní obálce.' 
+      },
+
+      // NOVÉ PRODUKTY Z OBRÁZKŮ
+      { 
+        id: 'p7', 
+        name: '3D Tkaná nášivka Tereza Tactical (Subdued)', 
+        price: 320, 
+        stock: 35, 
+        image: 'nasivka-tereza-tactical-subdued.jpg', 
+        desc: 'Taktická tkaná nášivka v odstínech šedi se suchým zipem (Velcro). Zkřížené pušky AR-15 a jemné drážkování pro operativní využití.' 
+      },
+      { 
+        id: 'p8', 
+        name: 'Zlatý emblém Český Lev – Limitovaná edice', 
+        price: 3490, 
+        stock: 5, 
+        image: 'zlaty-emblem-cesky-lev.jpg', 
+        desc: 'Exkluzivní zlacený odznak českého lva v reprezentativním černém boxu se zeleným sametem a certifikátem pravosti (Limitovaná série 1/1000).' 
+      },
+      { 
+        id: 'p9', 
+        name: 'Polo triko La Martina Style – Khaki / Gold', 
+        price: 1890, 
+        stock: 20, 
+        image: 'polo-tricko-khaki-gold-lev.jpg', 
+        desc: 'Prémiové piqué polo triko v barvě Khaki se strukturovaným prsním štítem (lev, meče, šíp) v lesklém bronzově-zlatém provedení.' 
+      },
+      { 
+        id: 'p10', 
+        name: 'Sběratelský plakát Josef Ptáčník – Velitel', 
+        price: 450, 
+        stock: 30, 
+        image: 'plakat-josef-ptacnik-velitel.jpg', 
+        desc: 'Reprezentativní tisk na archivním papíře A2 s velitelem policie, státní vlajkou a heslem „Svaly pro službu, srdce pro lidi.“' 
+      },
+      { 
+        id: 'p11', 
+        name: 'Dárkový set Sanctus Michael – Ochranná karta & Medailon', 
+        price: 1290, 
+        stock: 12, 
+        image: 'darkovy-set-sanctus-michael.jpg', 
+        desc: 'Luxusní dárková kazeta obsahující bronzový medailon svatého Michaela Archanděla a laminovanou modlitební kartu v latinském jazyce.' 
+      }
     ];
 
     // Cesta k produktovým obrázkům (relativně k HTML souboru)
